@@ -8,17 +8,14 @@ import matplotlib.pyplot as plt
 
 # --- Configuración de la página ---
 st.set_page_config(page_title="Top 10 S&P 500 con AI", layout="wide")
-
 st.title("📊 Ranking S&P 500 con AI")
 st.markdown("Prototipo con datos de Yahoo Finance y predicciones semanales usando **Random Forest**")
 
-# --- Descargar lista de empresas del S&P500 ---
+# --- Cargar lista de tickers desde CSV local ---
 @st.cache_data
 def load_sp500_tickers():
-    sp500 = pd.read_html(
-        'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
-    )[0]
-    return sp500['Symbol'].tolist()
+    df = pd.read_csv("sp500.csv")  # Asegúrate de subir este CSV con columna 'Symbol'
+    return df['Symbol'].tolist()
 
 tickers = load_sp500_tickers()
 
@@ -58,7 +55,6 @@ for ticker in tickers[:50]:  # limitar a primeras 50 para no saturar
         continue
 
     X, y = np.array(X), np.array(y)
-
     model = RandomForestRegressor(n_estimators=100, random_state=42)
     model.fit(X, y)
 
@@ -80,3 +76,8 @@ if empresa:
     data[empresa].plot(ax=ax)
     ax.set_title(f"Evolución de {empresa}")
     st.pyplot(fig)
+
+# --- Opcional: futuro soporte para actualizar tickers desde API ---
+# def update_tickers_from_api():
+#     # Aquí se podría conectar a una API para traer tickers del S&P500 actualizados
+#     pass
